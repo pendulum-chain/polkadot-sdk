@@ -292,6 +292,7 @@ where
 			Box::pin(async move {
 				// leave some time for evaluation and block finalization (33%)
 				let deadline = (self.now)() + max_duration - max_duration / 3;
+
 				let res = self
 					.propose_with(inherent_data, inherent_digests, deadline, block_size_limit)
 					.await;
@@ -335,8 +336,11 @@ where
 		block_size_limit: Option<usize>,
 	) -> Result<Proposal<Block, PR::Proof>, sp_blockchain::Error> {
 		let propose_with_timer = time::Instant::now();
+		debug!(target: LOG_TARGET, "Creating new block");
+
 		let mut block_builder =
 			self.client.new_block_at(self.parent_hash, inherent_digests, PR::ENABLED)?;
+		debug!(target: LOG_TARGET, "New block builder created");
 
 		self.apply_inherents(&mut block_builder, inherent_data)?;
 
@@ -365,6 +369,7 @@ where
 		let create_inherents_start = time::Instant::now();
 		let inherents = block_builder.create_inherents(inherent_data)?;
 		let create_inherents_end = time::Instant::now();
+		debug!(target: LOG_TARGET, "Reporting metrics");
 
 		self.metrics.report(|metrics| {
 			metrics.create_inherents_time.observe(
@@ -373,6 +378,8 @@ where
 					.as_secs_f64(),
 			);
 		});
+
+		debug!(target: LOG_TARGET, "Applying inherents");
 
 		for inherent in inherents {
 			match block_builder.push(inherent) {
@@ -420,6 +427,7 @@ where
 		let mut t1 = self.transaction_pool.ready_at(self.parent_number).fuse();
 		let mut t2 =
 			futures_timer::Delay::new(deadline.saturating_duration_since((self.now)()) / 8).fuse();
+		debug!(target: LOG_TARGET, "Waiting for pool to be ready");
 
 		let mut pending_iterator = select! {
 			res = t1 => res,
@@ -447,6 +455,7 @@ where
 			};
 
 			let now = (self.now)();
+			debug!(target: LOG_TARGET, "now = {:?}, deadline = {:?}", now, deadline);
 			if now > deadline {
 				debug!(
 					target: LOG_TARGET,

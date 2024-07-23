@@ -28,10 +28,12 @@ use sp_consensus::{self, BlockOrigin, Environment, Proposer, SelectChain};
 use sp_inherents::{CreateInherentDataProviders, InherentDataProvider};
 use sp_runtime::traits::{Block as BlockT, Header as HeaderT};
 use std::{sync::Arc, time::Duration};
-
+use log::trace;
+use std::time::Instant;
+use std::time;
 /// max duration for creating a proposal in secs
 pub const MAX_PROPOSAL_DURATION: u64 = 10;
-
+const LOG_TARGET: &str = "manual-seal";
 /// params for sealing a new block
 pub struct SealBlockParams<'a, B: BlockT, BI, SC, C: ProvideRuntimeApi<B>, E, TP, CIDP, P> {
 	/// if true, empty blocks(without extrinsics) will be created.
@@ -114,12 +116,19 @@ pub async fn seal_block<B, BI, SC, C, E, TP, CIDP, P>(
 		} else {
 			Default::default()
 		};
+		let max_duration = Duration::from_secs(MAX_PROPOSAL_DURATION);
+		trace!(target: LOG_TARGET, "now = {:?}", time::Instant::now());
+		trace!(target: LOG_TARGET, "max duration = {:?}", max_duration);
+		trace!(target: LOG_TARGET, "max duration * 1/3 = {:?}", max_duration / 3);
+		let deadline = time::Instant::now() + max_duration - max_duration / 3;
+		trace!(target: LOG_TARGET, "deadline = {:?}", deadline);
+
 
 		let proposal = proposer
 			.propose(
 				inherent_data.clone(),
 				digest,
-				Duration::from_secs(MAX_PROPOSAL_DURATION),
+				max_duration,
 				None,
 			)
 			.map_err(|err| Error::StringError(err.to_string()))
