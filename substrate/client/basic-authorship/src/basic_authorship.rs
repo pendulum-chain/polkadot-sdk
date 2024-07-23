@@ -335,8 +335,15 @@ where
 		block_size_limit: Option<usize>,
 	) -> Result<Proposal<Block, PR::Proof>, sp_blockchain::Error> {
 		let propose_with_timer = time::Instant::now();
+		info!(
+			" Starting block production ",
+		);
 		let mut block_builder =
 			self.client.new_block_at(self.parent_hash, inherent_digests, PR::ENABLED)?;
+
+		info!(
+			"Starting to apply inherents",
+		);
 
 		self.apply_inherents(&mut block_builder, inherent_data)?;
 
@@ -344,6 +351,7 @@ where
 		// <https://github.com/paritytech/substrate/pull/14275/>
 
 		let block_timer = time::Instant::now();
+
 		let end_reason =
 			self.apply_extrinsics(&mut block_builder, deadline, block_size_limit).await?;
 		let (block, storage_changes, proof) = block_builder.build()?.into_inner();
@@ -407,6 +415,9 @@ where
 		deadline: time::Instant,
 		block_size_limit: Option<usize>,
 	) -> Result<EndProposingReason, sp_blockchain::Error> {
+		info!(
+			"Starting to apply extrinsics",
+		);
 		// proceed with transactions
 		// We calculate soft deadline used only in case we start skipping transactions.
 		let now = (self.now)();
@@ -421,6 +432,9 @@ where
 		let mut t2 =
 			futures_timer::Delay::new(deadline.saturating_duration_since((self.now)()) / 8).fuse();
 
+		info!(
+			"Waiting for tx pool ready",
+		);
 		let mut pending_iterator = select! {
 			res = t1 => res,
 			_ = t2 => {
