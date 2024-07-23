@@ -335,13 +335,13 @@ where
 		block_size_limit: Option<usize>,
 	) -> Result<Proposal<Block, PR::Proof>, sp_blockchain::Error> {
 		let propose_with_timer = time::Instant::now();
-		info!(
+		debug!(
 			" Starting block production ",
 		);
 		let mut block_builder =
 			self.client.new_block_at(self.parent_hash, inherent_digests, PR::ENABLED)?;
 
-		info!(
+		debug!(
 			"Starting to apply inherents",
 		);
 
@@ -415,7 +415,7 @@ where
 		deadline: time::Instant,
 		block_size_limit: Option<usize>,
 	) -> Result<EndProposingReason, sp_blockchain::Error> {
-		info!(
+		debug!(
 			"Starting to apply extrinsics",
 		);
 		// proceed with transactions
@@ -432,7 +432,7 @@ where
 		let mut t2 =
 			futures_timer::Delay::new(deadline.saturating_duration_since((self.now)()) / 8).fuse();
 
-		info!(
+			debug!(
 			"Waiting for tx pool ready",
 		);
 		let mut pending_iterator = select! {
