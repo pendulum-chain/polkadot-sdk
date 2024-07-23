@@ -527,7 +527,7 @@ dependencies = [
 [[package]]
 name = "ark-secret-scalar"
 version = "0.0.2"
-source = "git+https://github.com/w3f/ring-vrf#3ebdd261873da05124f4499c85a8e62d40411620"
+source = "git+https://github.com/w3f/ring-vrf?rev=e9782f9#e9782f938629c90f3adb3fff2358bc8d1386af3e"
 dependencies = [
  "ark-ec",
  "ark-ff",
@@ -575,7 +575,7 @@ dependencies = [
 [[package]]
 name = "ark-transcript"
 version = "0.0.2"
-source = "git+https://github.com/w3f/ring-vrf#3ebdd261873da05124f4499c85a8e62d40411620"
+source = "git+https://github.com/w3f/ring-vrf?rev=e9782f9#e9782f938629c90f3adb3fff2358bc8d1386af3e"
 dependencies = [
  "ark-ff",
  "ark-serialize",
@@ -1254,7 +1254,7 @@ dependencies = [
 [[package]]
 name = "bandersnatch_vrfs"
 version = "0.0.4"
-source = "git+https://github.com/w3f/ring-vrf#3ebdd261873da05124f4499c85a8e62d40411620"
+source = "git+https://github.com/w3f/ring-vrf?rev=e9782f9#e9782f938629c90f3adb3fff2358bc8d1386af3e"
 dependencies = [
  "ark-bls12-381",
  "ark-ec",
@@ -4449,7 +4449,7 @@ checksum = "86e3bdc80eee6e16b2b6b0f87fbc98c04bee3455e35174c0de1a125d0688c632"
 [[package]]
 name = "dleq_vrf"
 version = "0.0.2"
-source = "git+https://github.com/w3f/ring-vrf#3ebdd261873da05124f4499c85a8e62d40411620"
+source = "git+https://github.com/w3f/ring-vrf?rev=e9782f9#e9782f938629c90f3adb3fff2358bc8d1386af3e"
 dependencies = [
  "ark-ec",
  "ark-ff",
@@ -10450,7 +10450,7 @@ dependencies = [
  "log",
  "pallet-balances",
  "parity-scale-codec",
- "rand_chacha 0.2.2",
+ "rand_chacha 0.3.1",
  "scale-info",
  "sp-arithmetic",
  "sp-core",
@@ -10475,7 +10475,7 @@ dependencies = [
  "pallet-staking-reward-curve",
  "pallet-timestamp",
  "parity-scale-codec",
- "rand_chacha 0.2.2",
+ "rand_chacha 0.3.1",
  "scale-info",
  "serde",
  "sp-application-crypto",
@@ -14841,7 +14841,7 @@ dependencies = [
  "num-traits",
  "parity-scale-codec",
  "parking_lot 0.12.1",
- "rand_chacha 0.2.2",
+ "rand_chacha 0.3.1",
  "sc-block-builder",
  "sc-client-api",
  "sc-consensus",
@@ -17255,7 +17255,7 @@ dependencies = [
  "parity-scale-codec",
  "parking_lot 0.12.1",
  "rand 0.7.3",
- "rand_chacha 0.2.2",
+ "rand_chacha 0.3.1",
  "sp-core",
  "sp-externalities",
  "thiserror",
