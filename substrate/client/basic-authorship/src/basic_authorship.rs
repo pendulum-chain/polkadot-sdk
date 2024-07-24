@@ -800,6 +800,14 @@ mod tests {
 	// the nonce is not matching.
 	#[test]
 	fn should_not_remove_invalid_transactions_from_the_same_sender_after_one_was_invalid() {
+
+		env_logger::init_from_env(
+			// 	let (client, _tmp_dir) =
+			env_logger::Env::default()
+			// 		default_provider_client(AccountKeyring::Alice, is_public_network).await;
+			.filter_or(env_logger::DEFAULT_FILTER_ENV, log::LevelFilter::Info.as_str()),
+			
+		);
 		// given
 		let client = Arc::new(substrate_test_runtime_client::new());
 		let spawner = sp_core::testing::TaskExecutor::new();
