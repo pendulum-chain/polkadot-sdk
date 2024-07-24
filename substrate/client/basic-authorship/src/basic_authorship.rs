@@ -371,7 +371,11 @@ where
 		inherent_data: InherentData,
 	) -> Result<(), sp_blockchain::Error> {
 		let create_inherents_start = time::Instant::now();
+		
 		let inherents = block_builder.create_inherents(inherent_data)?;
+		debug!(target: LOG_TARGET,
+			"Inherents created",
+		);
 		let create_inherents_end = time::Instant::now();
 
 		self.metrics.report(|metrics| {
@@ -382,6 +386,9 @@ where
 			);
 		});
 
+		debug!(target: LOG_TARGET,
+			"Metric report finished",
+		);
 		for inherent in inherents {
 			match block_builder.push(inherent) {
 				Err(ApplyExtrinsicFailed(Validity(e))) if e.exhausted_resources() => {
