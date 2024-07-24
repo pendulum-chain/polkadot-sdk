@@ -1,0 +1,38 @@
+name: Test
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
+
+jobs:
+  quick_check:
+    strategy:
+      matrix:
+        os: ["ubuntu-latest"]
+    runs-on: ${{ matrix.os }}
+    container:
+      image: paritytech/ci-unified:bullseye-1.70.0-2023-05-23-v20230706
+    steps:
+      - name: Freeing up more disk space
+        run: |
+          free -h
+          sudo rm -rf /usr/local/lib/android # will release about 10 GB if you don't need Android
+          sudo rm -rf /usr/share/dotnet # will release about 20GB if you don't need .NET
+          sudo rm -rf /opt/ghc
+          sudo rm -rf /usr/local/share/boost
+          sudo rm -rf /opt/hostedtoolcache/CodeQL
+          sudo rm -rf "$AGENT_TOOLSDIRECTORY"
+          sudo apt-get remove -y 'php.*' --fix-missing
+          sudo apt-get remove -y '^mongodb-.*' --fix-missing
+          sudo apt-get remove -y '^mysql-.*' --fix-missing
+          sudo apt-get clean          
+          df -h
+          
+      - uses: actions/checkout@3df4ab11eba7bda6032a0b82a6bb43b11571feac # v4.0.0
+      - name: Cargo test
+        env:
+          RUST_LOG: txpool=trace,basic-authorship=trace
+        run: cargo test should_not_remove_invalid_transactions_from_the_same_sender_after_one_was_invalid

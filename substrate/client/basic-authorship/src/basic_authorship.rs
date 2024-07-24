@@ -335,8 +335,15 @@ where
 		block_size_limit: Option<usize>,
 	) -> Result<Proposal<Block, PR::Proof>, sp_blockchain::Error> {
 		let propose_with_timer = time::Instant::now();
+		debug!(target: LOG_TARGET,
+			" Starting block production ",
+		);
 		let mut block_builder =
 			self.client.new_block_at(self.parent_hash, inherent_digests, PR::ENABLED)?;
+
+		debug!(target: LOG_TARGET,
+			"Starting to apply inherents",
+		);
 
 		self.apply_inherents(&mut block_builder, inherent_data)?;
 
@@ -344,6 +351,7 @@ where
 		// <https://github.com/paritytech/substrate/pull/14275/>
 
 		let block_timer = time::Instant::now();
+
 		let end_reason =
 			self.apply_extrinsics(&mut block_builder, deadline, block_size_limit).await?;
 		let (block, storage_changes, proof) = block_builder.build()?.into_inner();
@@ -363,7 +371,11 @@ where
 		inherent_data: InherentData,
 	) -> Result<(), sp_blockchain::Error> {
 		let create_inherents_start = time::Instant::now();
+		
 		let inherents = block_builder.create_inherents(inherent_data)?;
+		debug!(target: LOG_TARGET,
+			"Inherents created",
+		);
 		let create_inherents_end = time::Instant::now();
 
 		self.metrics.report(|metrics| {
@@ -374,6 +386,9 @@ where
 			);
 		});
 
+		debug!(target: LOG_TARGET,
+			"Metric report finished",
+		);
 		for inherent in inherents {
 			match block_builder.push(inherent) {
 				Err(ApplyExtrinsicFailed(Validity(e))) if e.exhausted_resources() => {
@@ -407,6 +422,9 @@ where
 		deadline: time::Instant,
 		block_size_limit: Option<usize>,
 	) -> Result<EndProposingReason, sp_blockchain::Error> {
+		debug!(target: LOG_TARGET,
+			"Starting to apply extrinsics",
+		);
 		// proceed with transactions
 		// We calculate soft deadline used only in case we start skipping transactions.
 		let now = (self.now)();
@@ -421,6 +439,9 @@ where
 		let mut t2 =
 			futures_timer::Delay::new(deadline.saturating_duration_since((self.now)()) / 8).fuse();
 
+		debug!(target: LOG_TARGET,
+			"Waiting for tx pool ready",
+		);
 		let mut pending_iterator = select! {
 			res = t1 => res,
 			_ = t2 => {
@@ -779,6 +800,14 @@ mod tests {
 	// the nonce is not matching.
 	#[test]
 	fn should_not_remove_invalid_transactions_from_the_same_sender_after_one_was_invalid() {
+
+		env_logger::init_from_env(
+			// 	let (client, _tmp_dir) =
+			env_logger::Env::default()
+			// 		default_provider_client(AccountKeyring::Alice, is_public_network).await;
+			.filter_or(env_logger::DEFAULT_FILTER_ENV, log::LevelFilter::Info.as_str()),
+			
+		);
 		// given
 		let client = Arc::new(substrate_test_runtime_client::new());
 		let spawner = sp_core::testing::TaskExecutor::new();
