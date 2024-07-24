@@ -17,7 +17,7 @@ jobs:
       image: paritytech/ci-unified:bullseye-1.70.0-2023-05-23-v20230706
     steps:
       - uses: actions/checkout@3df4ab11eba7bda6032a0b82a6bb43b11571feac # v4.0.0
-      - env:
-          RUST_LOG: txpool=trace,basic-authorship=trace cargo test should_not_remove_invalid_transactions_from_the_same_sender_after_one_was_invalid
       - name: Cargo test
+        env:
+          RUST_LOG: txpool=trace,basic-authorship=trace
         run: cargo test should_not_remove_invalid_transactions_from_the_same_sender_after_one_was_invalid
