@@ -132,7 +132,7 @@ impl<T: Config> GasMeter<T> {
 	/// # Note
 	///
 	/// Passing `0` as amount is interpreted as "all remaining gas".
-	pub fn nested(&mut self, amount: Weight) -> Self {
+	pub fn nested(&mut self, amount: Weight) -> Result<Self, DispatchError>  {
 		let amount = Weight::from_parts(
 			if amount.ref_time().is_zero() {
 				self.gas_left().ref_time()
@@ -147,7 +147,7 @@ impl<T: Config> GasMeter<T> {
 		)
 		.min(self.gas_left);
 		self.gas_left -= amount;
-		GasMeter::new(amount)
+		Ok(GasMeter::new(amount))
 	}
 
 	/// Absorb the remaining gas of a nested meter after we are done using it.
