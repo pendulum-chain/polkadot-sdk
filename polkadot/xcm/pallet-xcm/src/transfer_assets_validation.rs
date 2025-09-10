@@ -24,6 +24,7 @@ use hex_literal::hex;
 use sp_core::Get;
 use xcm::prelude::*;
 use xcm_executor::traits::TransferType;
+use sp_std::vec::Vec;
 
 /// The genesis hash of the Paseo Relay Chain. Used to identify it.
 const PASEO_GENESIS_HASH: [u8; 32] =
