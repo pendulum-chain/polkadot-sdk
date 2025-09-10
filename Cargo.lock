@@ -11206,6 +11206,7 @@ dependencies = [
  "frame-benchmarking",
  "frame-support",
  "frame-system",
+ "hex-literal",
  "log",
  "pallet-assets",
  "pallet-balances",
@@ -11221,6 +11222,7 @@ dependencies = [
  "staging-xcm",
  "staging-xcm-builder",
  "staging-xcm-executor",
+ "tracing",
 ]
 
 [[package]]
