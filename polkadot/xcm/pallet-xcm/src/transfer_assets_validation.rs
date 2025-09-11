@@ -22,9 +22,9 @@
 use crate::{Config, Error, Pallet};
 use hex_literal::hex;
 use sp_core::Get;
+use sp_std::vec::Vec;
 use xcm::prelude::*;
 use xcm_executor::traits::TransferType;
-use sp_std::vec::Vec;
 
 /// The genesis hash of the Paseo Relay Chain. Used to identify it.
 const PASEO_GENESIS_HASH: [u8; 32] =
@@ -117,9 +117,9 @@ impl<T: Config> Pallet<T> {
 	fn is_network_native_asset(asset_id: &AssetId) -> bool {
 		let universal_location = T::UniversalLocation::get();
 		let asset_location = match asset_id {
-            AssetId::Concrete(location) => location,
-            AssetId::Abstract(_) => return false, // What case will this be?
-        };
+			AssetId::Concrete(location) => location,
+			AssetId::Abstract(_) => return false, // Do not allow abstract assets for this check.
+		};
 
 		match universal_location.len() {
 			// Case 1: We are on the Relay Chain itself.
