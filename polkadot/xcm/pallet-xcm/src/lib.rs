@@ -24,6 +24,7 @@ pub mod benchmarking;
 mod mock;
 #[cfg(test)]
 mod tests;
+mod transfer_assets_validation;
 
 pub mod migration;
 
@@ -1334,6 +1335,16 @@ pub mod pallet {
 			let (fees_transfer_type, assets_transfer_type) =
 				Self::find_fee_and_assets_transfer_types(&assets, fee_asset_item, &dest)?;
 
+			// We check for network native asset reserve transfers in preparation for the Asset Hub
+			// Migration. This check will be removed after the migration and the determined
+			// reserve location adjusted accordingly. For more information, see https://github.com/paritytech/polkadot-sdk/issues/9054.
+			Self::ensure_network_asset_reserve_transfer_allowed(
+				&assets,
+				fee_asset_item,
+				&assets_transfer_type,
+				&fees_transfer_type,
+			)?;
+
 			// local and remote XCM programs to potentially handle fees separately
 			let fees = if fees_transfer_type == assets_transfer_type {
 				// no need for custom fees instructions, fees are batched with assets
@@ -1544,6 +1555,16 @@ impl<T: Config> Pallet<T> {
 		ensure!(assets_transfer_type != TransferType::Teleport, Error::<T>::Filtered);
 		// Ensure all assets (including fees) have same reserve location.
 		ensure!(assets_transfer_type == fees_transfer_type, Error::<T>::TooManyReserves);
+
+		// We check for network native asset reserve transfers in preparation for the Asset Hub
+		// Migration. This check will be removed after the migration and the determined
+		// reserve location adjusted accordingly. For more information, see https://github.com/paritytech/polkadot-sdk/issues/9054.
+		Self::ensure_network_asset_reserve_transfer_allowed(
+			&assets,
+			fee_asset_item,
+			&assets_transfer_type,
+			&fees_transfer_type,
+		)?;
 
 		Self::build_and_execute_xcm_transfer_type(
 			origin,
